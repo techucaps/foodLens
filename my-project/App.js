@@ -14,6 +14,9 @@ global.Buffer = global.Buffer || require('buffer').Buffer; // Required for aws s
 
 import React from 'react';
 import { DrawerNavigator } from 'react-navigation';
+import Amplify from 'aws-amplify';
+
+import aws_exports from './YOUR-PATH-TO/aws-exports';
 
 import { WithAuth } from './lib/Categories/Auth/Components';
 import Amplify from 'aws-amplify';
@@ -25,6 +28,7 @@ import SignOut from './src/Components/SignOut';
 import ForgotPassword from './src/Components/ForgotPassword';
 
 Amplify.configure(awsmobile);
+Amplify.configure(aws_exports);
 
 const App = DrawerNavigator({
   Home: {
