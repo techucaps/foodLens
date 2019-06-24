@@ -1,0 +1,20 @@
+{
+    "appName": "foodlens",
+    "roleName": "pinpointLambdaRolee8ed7bd4",
+    "cloudWatchPolicyName": "cloudWatchPolicye8ed7bd4",
+    "pinpointPolicyName": "pinpointPolicye8ed7bd4",
+    "authPolicyName": "pinpoint_amplify_e8ed7bd4",
+    "unauthPolicyName": "pinpoint_amplify_e8ed7bd4",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    }
+}

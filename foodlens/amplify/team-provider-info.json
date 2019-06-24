@@ -1,0 +1,19 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "foodlens-dev-20190624133731-authRole",
+            "UnauthRoleArn": "arn:aws:iam::448775410061:role/foodlens-dev-20190624133731-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::448775410061:role/foodlens-dev-20190624133731-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "foodlens-dev-20190624133731-deployment",
+            "UnauthRoleName": "foodlens-dev-20190624133731-unauthRole",
+            "StackName": "foodlens-dev-20190624133731",
+            "StackId": "arn:aws:cloudformation:us-east-1:448775410061:stack/foodlens-dev-20190624133731/be7ab0c0-96a6-11e9-b933-0e23fbf2c85e"
+        },
+        "categories": {
+            "auth": {
+                "cognito63ea0bd2": {}
+            }
+        }
+    }
+}
