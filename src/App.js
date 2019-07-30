@@ -190,7 +190,7 @@ componentDidMount() {
     if (this.uploadInput.files[0]) {
       let file = this.uploadInput.files[0];
       this.getBase64(file, result => {
-        fetch(
+       const first = fetch(
          /* S3 endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
           {
             method: "POST",
@@ -201,7 +201,16 @@ componentDidMount() {
             body: JSON.stringify({ payload : result.split(",")[1] })
           }
         )
-          .then(response => console.log(response.json()))
+
+        const second = fetch(
+            /* API endpoint */"https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/details", {
+            method: "GET",
+            headers: {},
+            
+           // body: JSON.stringify({ itemName : "tilapia" })
+        }
+        )
+          .then(response => response.json())
           .then(data =>
             this.setState({
               key: data.key,
@@ -212,7 +221,7 @@ componentDidMount() {
               message: "UPLOAD AN IMAGE"
             })
           )
-          .catch(err => console.log(err));
+          .catch(err => console.log(err));  
       });
     } else {
       return null;
@@ -236,10 +245,11 @@ componentDidMount() {
   
   render() {
     return (
+      
       <div className="App">
         <center>
           <div className="wizard">
-            <h1>FOODLENS</h1>
+            <h1>FOODLENS 🧐</h1>
            {/*  {this.state.loading
               ? setTimeout(() => {
                   this.predictFish(  invoke endpoint URL 
@@ -260,7 +270,7 @@ componentDidMount() {
                 }, 2500)
               : null} */}
             {this.state.loading ? (
-              <Loader type="Puff" color="#FFfFFF" height="200" width="200" />
+              <Loader type="Grid" color="#FFFFFF" height="80" width="80" />
             ) : null}
             {this.state.image ? (
               <div className="prediction">
@@ -284,7 +294,7 @@ componentDidMount() {
                       </div>
                     )}
                     <button className="openCamera" onClick={this.showCamera}>
-                      Take more photos
+                      Wanna take more photos?
                     </button>
                   </div>
                 ) : null}
