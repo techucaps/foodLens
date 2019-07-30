@@ -146,12 +146,12 @@ componentDidMount() {
   };
 
   onTakePhoto(dataUri) {
-    const fishy = dataUri.split(",")[1];
+    const savedImage = dataUri.split(",")[1];
     fetch(
-      /* S3 endpoint here */ "",
+      /* API endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
       {
         method: "POST",
-        body: JSON.stringify({ fishy: fishy })
+        body: JSON.stringify({ payload : savedImage})
       }
     )
       .then(response => response.json())
@@ -191,13 +191,17 @@ componentDidMount() {
       let file = this.uploadInput.files[0];
       this.getBase64(file, result => {
         fetch(
-         /* S3 endpoint here */ "",
+         /* S3 endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
           {
             method: "POST",
-            body: JSON.stringify({ fishy : result.split(",")[1] })
+            headers: {
+              //"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+              //'Access-Control-Allow-Origin': "*"
+            },
+            body: JSON.stringify({ payload : result.split(",")[1] })
           }
         )
-          .then(response => response.json())
+          .then(response => console.log(response.json()))
           .then(data =>
             this.setState({
               key: data.key,
@@ -236,21 +240,25 @@ componentDidMount() {
         <center>
           <div className="wizard">
             <h1>FOODLENS</h1>
-            {this.state.loading
+           {/*  {this.state.loading
               ? setTimeout(() => {
-                  this.predictFish( /* invoke endpoint URL */
-                    "https://runtime.sagemaker.us-east-1.amazonaws.com/endpoints/foodlens-sagemaker-endpoint/invocations",
+                  this.predictFish(  invoke endpoint URL 
+                    "",
                     {
-                      method: "POST",
-                      body: JSON.stringify({ 
+                      //method: "POST",
+                      headers: {
+                        //"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        //'Access-Control-Allow-Origin': "*"
+                      },
+                       body: JSON.stringify({ 
                         url:
-                        /* cloudfront URL */  "" +
+                         "" + 
                           this.state.key
-                      })
+                      }) 
                     }
                   );
                 }, 2500)
-              : null}
+              : null} */}
             {this.state.loading ? (
               <Loader type="Puff" color="#FFfFFF" height="200" width="200" />
             ) : null}
@@ -275,7 +283,6 @@ componentDidMount() {
                         <p>We were unable to identify this fish. Please try again.</p>
                       </div>
                     )}
-
                     <button className="openCamera" onClick={this.showCamera}>
                       Take more photos
                     </button>
@@ -312,7 +319,7 @@ componentDidMount() {
                   }}
                   onChange={this.handleChange}
                   type="file"
-                  accept="image/png, image/jpeg"
+                  accept="image/jpeg"
                 />
                 <label htmlFor="inputfile">
                   UPLOAD <span role="img"></span>
@@ -320,29 +327,6 @@ componentDidMount() {
                 <button className="uploadButton" onClick={this.handleUpload}>
                   TEST
                 </button>
-                {/* {this.state.upload ? (
-                  <div>
-                    <input
-                      className="inputfile"
-                      id="inputfile"
-                      name="input"
-                      onChange={this.handleChange}
-                      ref={ref => {
-                        console.log(ref);
-                        this.uploadInput = ref;
-                      }}
-                      type="file"
-                      accept="image/png, image/jpeg"
-                    />
-                    <label htmlFor="inputfile">
-                      CHOOSE YOUR <span role="img">👟</span>
-                    </label>
-                  </div>
-                ) : (
-                  <button className="uploadButton" onClick={this.handleUpload}>
-                    UPLOAD
-                  </button>
-                )} */}
               </div>
             )}
           </div>
