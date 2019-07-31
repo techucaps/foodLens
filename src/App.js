@@ -1,17 +1,20 @@
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
-import "@tensorflow/tfjs";
+
 import React, { Component } from "react";
 import Camera, { IMAGE_TYPES } from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import Loader from "react-loader-spinner";
+import Popup from "reactjs-popup";
+//import './BoundingBox.js';
 import "./App.css";
 import './Camera.css';
 import "./Emojicon";
 
+  
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      itemInfo: [],
       fishclass: "",
       confidence: "",
       loading: false,
@@ -21,104 +24,7 @@ class App extends Component {
       upload: false,
       dataUri: "",
       prediction: false
-    };
-  }
-
-videoRef = React.createRef();
-canvasRef = React.createRef();
-
-componentDidMount() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      const webCamPromise = navigator.mediaDevices
-        .getUserMedia({
-          audio: false,
-          video: {
-            facingMode: "user"
-          }
-        })
-        .then(stream => {
-          window.stream = stream;
-          this.videoRef.current.srcObject = stream;
-          return new Promise((resolve, reject) => {
-            this.videoRef.current.onloadedmetadata = () => {
-              resolve();
-            };
-          });
-        });
-      const modelPromise = cocoSsd.load();
-      Promise.all([modelPromise, webCamPromise])
-        .then(values => {
-          this.detectFrame(this.videoRef.current, values[0]);
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }
-  }
-
-  detectFrame = (video, model) => {
-    model.detect(video).then(predictions => {
-      this.renderPredictions(predictions);
-      requestAnimationFrame(() => {
-        this.detectFrame(video, model);
-      });
-    });
-  };
-
-  renderPredictions = predictions => {
-    const ctx = this.canvasRef.current.getContext("2d");
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    // Font options.
-    const font = "16px sans-serif";
-    ctx.font = font;
-    ctx.textBaseline = "top";
-    predictions.forEach(prediction => {
-      const x = prediction.bbox[0];
-      const y = prediction.bbox[1];
-      const width = prediction.bbox[2];
-      const height = prediction.bbox[3];
-
-      // Draw the bounding box.
-      ctx.strokeStyle = "#00FFFF";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x, y, width, height);
-
-      // Draw the label background.
-      ctx.fillStyle = "#00FFFF";
-      const textWidth = ctx.measureText(prediction.class).width;
-      const textHeight = parseInt(font, 10); // base 10
-      ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
-    });
-
-    predictions.forEach(prediction => {
-      const x = prediction.bbox[0];
-      const y = prediction.bbox[1];
-      // Draw the text last to ensure it's on top.
-      ctx.fillStyle = "#000000";
-      ctx.fillText(prediction.class, x, y);
-    });
-  };
-
-  render() {
-    return (
-      <div>
-        <video
-          className="size"
-          autoPlay
-          playsInline
-          muted
-          ref={this.videoRef}
-          width="600"
-          height="500"
-        />
-        <canvas
-          className="size"
-          ref={this.canvasRef}
-          width="600"
-          height="500"
-        />
-      </div>
-    );
+    };  
   }
 
 
@@ -151,7 +57,7 @@ componentDidMount() {
       /* API endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
       {
         method: "POST",
-        body: JSON.stringify({ payload : savedImage})
+        body: JSON.stringify({ payload : savedImage })
       }
     )
       .then(response => response.json())
@@ -164,33 +70,42 @@ componentDidMount() {
         })
       )
       .catch(err => console.log(err));
+
+      
   }
 
-  async predictFish(url, options, n) {
-    try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-      let fishclass = data.class.split("'")[1].replace(/_/g, " ");
-      let confidence = String(data.confidence * 100).substring(0, 5) + "%";
-      this.setState({
-        image: true,
-        loading: false,
-        fishclass: fishclass,
-        confidence: confidence,
-        upload: false,
-        prediction: true
-      });
-    } catch (err) {
-      if (n === 1) throw err;
-      return await this.predictFish(url, options, (n = 1));
-    }
-  }
+  state = { isOpen: false };
+
+  handleShowDialog = () => {
+    this.setState({ isOpen: !this.state.isOpen });
+    console.log('clicked');
+  };
+
+  // async predictFish(url, options, n) {
+  //   try {
+  //     const response = await fetch(url, options);
+  //     const data = await response.json();
+  //     let fishclass = data.class.split("'")[1].replace(/_/g, " ");
+  //     let confidence = String(data.confidence * 100).substring(0, 5) + "%";
+  //     this.setState({
+  //       image: true,
+  //       loading: false,
+  //       fishclass: fishclass,
+  //       confidence: confidence,
+  //       upload: false,
+  //       prediction: true
+  //     });
+  //   } catch (err) {
+  //     if (n === 1) throw err;
+  //     return await this.predictFish(url, options, (n = 1));
+  //   }
+  // }
 
   handleUpload = event => {
     if (this.uploadInput.files[0]) {
       let file = this.uploadInput.files[0];
       this.getBase64(file, result => {
-       const first = fetch(
+       fetch(
          /* S3 endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
           {
             method: "POST",
@@ -200,15 +115,6 @@ componentDidMount() {
             },
             body: JSON.stringify({ payload : result.split(",")[1] })
           }
-        )
-
-        const second = fetch(
-            /* API endpoint */"https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/details", {
-            method: "GET",
-            headers: {},
-            
-           // body: JSON.stringify({ itemName : "tilapia" })
-        }
         )
           .then(response => response.json())
           .then(data =>
@@ -242,6 +148,9 @@ componentDidMount() {
     }
   };
 
+
+  
+
   
   render() {
     return (
@@ -250,6 +159,7 @@ componentDidMount() {
         <center>
           <div className="wizard">
             <h1>FOODLENS 🧐</h1>
+ 
            {/*  {this.state.loading
               ? setTimeout(() => {
                   this.predictFish(  invoke endpoint URL 
@@ -270,22 +180,23 @@ componentDidMount() {
                 }, 2500)
               : null} */}
             {this.state.loading ? (
-              <Loader type="Grid" color="#FFFFFF" height="80" width="80" />
-            ) : null}
+              <Loader type="Grid" color="#008080" height="80" width="80" />
+            ) : null }
             {this.state.image ? (
               <div className="prediction">
                 <img
                   className="fishImg"
                   src={this.state.dataUri}
                   alt="uploaded pic of fish"
+                  onClick={this.handleShowDialog}
+
                 />
                 {this.state.prediction ? (
                   <div>
                     {parseFloat(this.state.confidence) > 85 ? (
                       <div className="prediction">
                         <p>
-                          I'm <span>{this.state.confidence}</span> these are{" "}
-                          <span>{this.state.fishclass}</span>
+                          This is a <span>{this.state.result}</span> 
                         </p>
                       </div>
                     ) : (
@@ -298,13 +209,14 @@ componentDidMount() {
                     </button>
                   </div>
                 ) : null}
-                {/* <p>
-                  I'm <span>{this.state.confidence}</span> these are{" "}
-                  <span>{this.state.shoeclass}</span>
+                 <p>
+                  This is a {" "}
+                  <span>{this.state.payload}</span>
                 </p>
                 <button className="openCamera" onClick={this.showCamera}>
                   Take another photo!
-                </button> */}
+                </button> 
+              
               </div>
             ) : null}
             {this.state.cameraOn ? (
@@ -317,6 +229,7 @@ componentDidMount() {
                   }}
                 />
               </div>
+              
             ) : null}
             {this.state.loading ? null : (
               <div className="uploader">
