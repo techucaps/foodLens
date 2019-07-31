@@ -8,13 +8,14 @@ import Popup from "reactjs-popup";
 import "./App.css";
 import './Camera.css';
 import "./Emojicon";
+import Modal from "./Modal";
 
   
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      itemInfo: [],
+      myArray: [],
       fishclass: "",
       confidence: "",
       loading: false,
@@ -23,7 +24,8 @@ class App extends Component {
       key: "",
       upload: false,
       dataUri: "",
-      prediction: false
+      prediction: false,
+      isOpen: false
     };  
   }
 
@@ -74,7 +76,7 @@ class App extends Component {
       
   }
 
-  state = { isOpen: false };
+  
 
   handleShowDialog = () => {
     this.setState({ isOpen: !this.state.isOpen });
@@ -116,23 +118,67 @@ class App extends Component {
             body: JSON.stringify({ payload : result.split(",")[1] })
           }
         )
-          .then(response => response.json())
-          .then(data =>
+
+
+  .then(response => response.json())
+          .then(data => {
+            let tmp = JSON.stringify(data);
+            tmp = tmp.replace("{", "");
+            tmp = tmp.replace("}", "");
+            tmp = tmp.replace(/"/g, "");
+           // let myArray = tmp.split(",");
+
+           // console.log("tmp: ", tmp);
+           // console.log("test2: ", myArray);
+
             this.setState({
               key: data.key,
               cameraOn: false,
-              image: false,
+              image: true,
               dataUri: result,
               loading: true,
+              isOpen: true,
               message: "UPLOAD AN IMAGE"
-            })
-          )
-          .catch(err => console.log(err));  
+            });
+          })
+          .catch(err => console.log(err));
       });
     } else {
       return null;
     }
   };
+
+          // .then(res => res.json())
+        // .then(function(data) {
+        //   let tmp = JSON.stringify(data);
+        //   tmp = tmp.replace("{", "");
+        //   tmp = tmp.replace("}", "");
+        //   tmp = tmp.replace(/"/g, "");
+        //   let myArray = tmp.split(",");
+
+        //   console.log("test1: ", tmp);
+        //   console.log("test2: ", myArray);
+        // })
+
+  
+  //         .then(response => response.json())
+  //         .then(data =>
+  //           this.setState({
+  //             key: data.key,
+  //             cameraOn: false,
+  //             image: true,
+  //             dataUri: result,
+  //             loading: true,
+  //             isOpen: true,
+  //             message: "UPLOAD AN IMAGE"
+  //           })
+  //         )
+  //         .catch(err => console.log(err));  
+  //     });
+  //   } else {
+  //     return null;
+  //   }
+  // };
 
   handleChange = e => {
     if (this.uploadInput.files[0]) {
@@ -149,13 +195,40 @@ class App extends Component {
   };
 
 
-  
+  // componentDidMount() {
+  //   fetch("https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index")
+  //   .then(response => {
+  //     return response.json();
+  //    })
+  //    .then(data => {
+  //      let tempArray = []
+  //      for (var i =0; i < tempArray; i++) {
+  //        tempArray.push()
+  //        console.log(tempArray)
+  //      }
 
+  //      this.setState({
+  //        other: tempArray
+  //      })
+  //    });
+  //   }
+    
+
+    toggleModal = () => {
+      this.setState({
+        isOpen: !this.state.isOpen
+      });
+    }
+    
   
+    
   render() {
     return (
       
       <div className="App">
+        {/* <button onClick={this.toggleModal}>
+          Open the modal
+        </button> */}
         <center>
           <div className="wizard">
             <h1>FOODLENS 🧐</h1>
@@ -181,6 +254,7 @@ class App extends Component {
               : null} */}
             {this.state.loading ? (
               <Loader type="Grid" color="#008080" height="80" width="80" />
+              
             ) : null }
             {this.state.image ? (
               <div className="prediction">
@@ -196,7 +270,7 @@ class App extends Component {
                     {parseFloat(this.state.confidence) > 85 ? (
                       <div className="prediction">
                         <p>
-                          This is a <span>{this.state.result}</span> 
+                          {/* This is a <span>{this.state.result}</span>  */}
                         </p>
                       </div>
                     ) : (
@@ -209,10 +283,15 @@ class App extends Component {
                     </button>
                   </div>
                 ) : null}
-                 <p>
-                  This is a {" "}
+                 <div>
+                  {/* This is a {" "} */}
+                  <Modal show={this.state.isOpen}  
+                        onClose={this.toggleModal}>
+                          text
+                          
+                  </Modal>
                   <span>{this.state.payload}</span>
-                </p>
+                </div>
                 <button className="openCamera" onClick={this.showCamera}>
                   Take another photo!
                 </button> 

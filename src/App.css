@@ -45,11 +45,11 @@
 }
 
 .prediction p {
-  color: white;
+  color: black;
   font-size: 14px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background-color: black;
+  background-color: tea;
 }
 
 .openCamera {
