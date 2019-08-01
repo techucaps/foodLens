@@ -15,7 +15,6 @@ class App extends Component {
       idealFacingMode: FACING_MODES.USER, 
       myArray: [],
       fishclass: "",
-      confidence: "",
       loading: false,
       cameraOn: true,
       image: false,
