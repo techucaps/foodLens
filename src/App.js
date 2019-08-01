@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Camera, { IMAGE_TYPES, FACING_MODES } from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import Loader from "react-loader-spinner";
-//import './BoundingBox.js';
 import "./App.css";
 import "./Camera.css";
 import "./Emojicon";
