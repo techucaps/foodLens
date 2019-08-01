@@ -6,11 +6,10 @@ import Loader from "react-loader-spinner";
 import Popup from "reactjs-popup";
 //import './BoundingBox.js';
 import "./App.css";
-import './Camera.css';
+import "./Camera.css";
 import "./Emojicon";
 import Modal from "./Modal";
 
-  
 class App extends Component {
   constructor(props) {
     super(props);
@@ -26,9 +25,8 @@ class App extends Component {
       dataUri: "",
       prediction: false,
       isOpen: false
-    };  
+    };
   }
-
 
   getBase64(file, cb) {
     let reader = new FileReader();
@@ -59,7 +57,7 @@ class App extends Component {
       /* API endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
       {
         method: "POST",
-        body: JSON.stringify({ payload : savedImage })
+        body: JSON.stringify({ payload: savedImage })
       }
     )
       .then(response => response.json())
@@ -72,67 +70,43 @@ class App extends Component {
         })
       )
       .catch(err => console.log(err));
-
-      
   }
-
-  
 
   handleShowDialog = () => {
     this.setState({ isOpen: !this.state.isOpen });
-    console.log('clicked');
+    console.log("clicked");
   };
 
-  // async predictFish(url, options, n) {
-  //   try {
-  //     const response = await fetch(url, options);
-  //     const data = await response.json();
-  //     let fishclass = data.class.split("'")[1].replace(/_/g, " ");
-  //     let confidence = String(data.confidence * 100).substring(0, 5) + "%";
-  //     this.setState({
-  //       image: true,
-  //       loading: false,
-  //       fishclass: fishclass,
-  //       confidence: confidence,
-  //       upload: false,
-  //       prediction: true
-  //     });
-  //   } catch (err) {
-  //     if (n === 1) throw err;
-  //     return await this.predictFish(url, options, (n = 1));
-  //   }
-  // }
 
   handleUpload = event => {
     if (this.uploadInput.files[0]) {
       let file = this.uploadInput.files[0];
       this.getBase64(file, result => {
-       fetch(
-         /* S3 endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
+        fetch(
+          /* S3 endpoint here */ "https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index",
           {
             method: "POST",
             headers: {
               //"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
               //'Access-Control-Allow-Origin': "*"
             },
-            body: JSON.stringify({ payload : result.split(",")[1] })
+            body: JSON.stringify({ payload: result.split(",")[1] })
           }
         )
-
-
-  .then(response => response.json())
+          .then(response => response.json())
           .then(data => {
-            let tmp = JSON.stringify(data);
-            tmp = tmp.replace("{", "");
-            tmp = tmp.replace("}", "");
-            tmp = tmp.replace(/"/g, "");
-           // let myArray = tmp.split(",");
+            //let tmp = JSON.stringify(data);
+            // let tmp = data.json();
+            //tmp = tmp.replace("{", "");
+            //tmp = tmp.replace("}", "");
+            //tmp = tmp.replace(/"/g, "");
+            // let myArray = tmp.split(",");
 
-           // console.log("tmp: ", tmp);
-           // console.log("test2: ", myArray);
+            console.log("tmp: ", data);
+            // console.log("test2: ", myArray);
 
             this.setState({
-              key: data.key,
+              result: data,
               cameraOn: false,
               image: true,
               dataUri: result,
@@ -148,19 +122,18 @@ class App extends Component {
     }
   };
 
-          // .then(res => res.json())
-        // .then(function(data) {
-        //   let tmp = JSON.stringify(data);
-        //   tmp = tmp.replace("{", "");
-        //   tmp = tmp.replace("}", "");
-        //   tmp = tmp.replace(/"/g, "");
-        //   let myArray = tmp.split(",");
+  // .then(res => res.json())
+  // .then(function(data) {
+  //   let tmp = JSON.stringify(data);
+  //   tmp = tmp.replace("{", "");
+  //   tmp = tmp.replace("}", "");
+  //   tmp = tmp.replace(/"/g, "");
+  //   let myArray = tmp.split(",");
 
-        //   console.log("test1: ", tmp);
-        //   console.log("test2: ", myArray);
-        // })
+  //   console.log("test1: ", tmp);
+  //   console.log("test2: ", myArray);
+  // })
 
-  
   //         .then(response => response.json())
   //         .then(data =>
   //           this.setState({
@@ -173,7 +146,7 @@ class App extends Component {
   //             message: "UPLOAD AN IMAGE"
   //           })
   //         )
-  //         .catch(err => console.log(err));  
+  //         .catch(err => console.log(err));
   //     });
   //   } else {
   //     return null;
@@ -194,37 +167,40 @@ class App extends Component {
     }
   };
 
+  toggleModal = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  };
 
-  // componentDidMount() {
-  //   fetch("https://50xlesnkqe.execute-api.us-east-1.amazonaws.com/foodLens-deploy1/index")
-  //   .then(response => {
-  //     return response.json();
-  //    })
-  //    .then(data => {
-  //      let tempArray = []
-  //      for (var i =0; i < tempArray; i++) {
-  //        tempArray.push()
-  //        console.log(tempArray)
-  //      }
-
-  //      this.setState({
-  //        other: tempArray
-  //      })
-  //    });
+  // displayResults = () => {
+  //   let popArray = [];
+  //   for (let key in this.state.result) {
+  //     popArray.push(
+  //       <p key={key} className="information">
+  //         {key}: {this.state.result[key]}
+  //       </p>
+  //     );
   //   }
-    
+  //   return popArray;
+  // };
 
-    toggleModal = () => {
-      this.setState({
-        isOpen: !this.state.isOpen
-      });
-    }
-    
-  
-    
+  displayResults = () => {
+    let popArray = [];
+    popArray.push(
+      <p className="information">
+        Name: {this.state.result.name}
+        Size: {this.state.result.size}
+        Habitat: {this.state.result.habitat}
+        Weight: {this.state.result.weight}
+        Ethnicity: {this.state.result.ethnicity}
+      </p>
+    );
+    return popArray;
+  };
+
   render() {
     return (
-      
       <div className="App">
         {/* <button onClick={this.toggleModal}>
           Open the modal
@@ -232,10 +208,10 @@ class App extends Component {
         <center>
           <div className="wizard">
             <h1>FOODLENS 🧐</h1>
- 
-           {/*  {this.state.loading
+
+            {/*  {this.state.loading
               ? setTimeout(() => {
-                  this.predictFish(  invoke endpoint URL 
+                  this.predictFish(  invoke endpoint URL
                     "",
                     {
                       //method: "POST",
@@ -243,19 +219,18 @@ class App extends Component {
                         //"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
                         //'Access-Control-Allow-Origin': "*"
                       },
-                       body: JSON.stringify({ 
+                       body: JSON.stringify({
                         url:
-                         "" + 
+                         "" +
                           this.state.key
-                      }) 
+                      })
                     }
                   );
                 }, 2500)
               : null} */}
             {this.state.loading ? (
               <Loader type="Grid" color="#008080" height="80" width="80" />
-              
-            ) : null }
+            ) : null}
             {this.state.image ? (
               <div className="prediction">
                 <img
@@ -263,7 +238,6 @@ class App extends Component {
                   src={this.state.dataUri}
                   alt="uploaded pic of fish"
                   onClick={this.handleShowDialog}
-
                 />
                 {this.state.prediction ? (
                   <div>
@@ -275,7 +249,10 @@ class App extends Component {
                       </div>
                     ) : (
                       <div>
-                        <p>We were unable to identify this fish. Please try again.</p>
+                        <p>
+                          We were unable to identify this fish. Please try
+                          again.
+                        </p>
                       </div>
                     )}
                     <button className="openCamera" onClick={this.showCamera}>
@@ -283,19 +260,18 @@ class App extends Component {
                     </button>
                   </div>
                 ) : null}
-                 <div>
+                <div>
                   {/* This is a {" "} */}
-                  <Modal show={this.state.isOpen}  
-                        onClose={this.toggleModal}>
-                          text
-                          
+                  <Modal show={this.state.isOpen} onClose={this.toggleModal}>
+                    {this.state.result !== undefined
+                      ? this.displayResults()
+                      : ""}
                   </Modal>
                   <span>{this.state.payload}</span>
                 </div>
                 <button className="openCamera" onClick={this.showCamera}>
                   Take another photo!
-                </button> 
-              
+                </button>
               </div>
             ) : null}
             {this.state.cameraOn ? (
@@ -308,7 +284,6 @@ class App extends Component {
                   }}
                 />
               </div>
-              
             ) : null}
             {this.state.loading ? null : (
               <div className="uploader">
@@ -324,7 +299,7 @@ class App extends Component {
                   accept="image/jpeg"
                 />
                 <label htmlFor="inputfile">
-                  UPLOAD <span role="img"></span>
+                  UPLOAD <span role="img" />
                 </label>
                 <button className="uploadButton" onClick={this.handleUpload}>
                   TEST
