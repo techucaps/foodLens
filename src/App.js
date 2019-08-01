@@ -1,9 +1,7 @@
-
 import React, { Component } from "react";
 import Camera, { IMAGE_TYPES, FACING_MODES } from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import Loader from "react-loader-spinner";
-import Popup from "reactjs-popup";
 //import './BoundingBox.js';
 import "./App.css";
 import "./Camera.css";
@@ -64,10 +62,10 @@ class App extends Component {
       .then(response => response.json())
       .then(data =>
         this.setState({
-          key: data.key,
+          savedImage: data,
           cameraOn: false,
           loading: true,
-          dataUri: dataUri
+          dataUri: savedImage
         })
       )
       .catch(err => console.log(err));
@@ -175,15 +173,15 @@ class App extends Component {
   };
 
   changeCameraType() {
-    if (this.state.idealFacingMode === 'FACING_MODE.ENVIRONMENT') {
+    if (this.state.idealFacingMode === FACING_MODES.ENVIRONMENT) {
       this.setState({
-        idealFacingMode: 'FACING_MODE.USER',
-        mirror: true
+        idealFacingMode: FACING_MODES.USER,
+        isImageMirror: true
       });
     } else {
       this.setState({
-        idealFacingMode: 'FACING_MODE.ENVIRONMENT',
-        mirror: false
+        idealFacingMode: FACING_MODES.ENVIRONMENT,
+        isImageMirror: false
       });
     }
   }
@@ -216,14 +214,14 @@ class App extends Component {
 
   render() {
     return (
+      <div className="bg-image">
       <div className="App">
+       
         {/* <button onClick={this.toggleModal}>
           Open the modal
         </button> */}
-        <center>
           <div className="wizard">
             <h1>FOODLENS 🧐</h1>
-
             {/*  {this.state.loading
               ? setTimeout(() => {
                   this.predictFish(  invoke endpoint URL
@@ -293,12 +291,14 @@ class App extends Component {
               <div className="camera">
                 <Camera
                   imageType={IMAGE_TYPES.JPG}
+                  idealFacingMode={this.state.idealFacingMode} 
+                  isImageMirror={this.state.isImageMirror}
                   idealResolution={{ width: 2160, height: 1440 }}
                   onTakePhoto={dataUri => {
                     this.onTakePhoto(dataUri);
                   }}
                 />
-                <button onPress={this.changeCameraType.bind(this)}>
+                <button onClick={this.changeCameraType.bind(this)}>
             [SWITCH]</button>
               </div>
             ) : null}
@@ -316,15 +316,16 @@ class App extends Component {
                   accept="image/jpeg"
                 />
                 <label htmlFor="inputfile">
-                  UPLOAD <span role="img" />
+                  SELECT <span role="img" />
                 </label>
                 <button className="uploadButton" onClick={this.handleUpload}>
-                  TEST
+                  DETECT
                 </button>
               </div>
             )}
           </div>
-        </center>
+        
+      </div>
       </div>
     );
   }
